@@ -1,3 +1,3 @@
-module github.com/bluele/gcache
+module github.com/yanyugit/gcache
 
 go 1.15

@@ -120,20 +120,20 @@ func (c *SimpleCache) get(key interface{}, onLoad bool) (interface{}, error) {
 }
 
 func (c *SimpleCache) getValue(key interface{}, onLoad bool) (interface{}, error) {
-	c.mu.Lock()
+	c.mu.RLock()
 	item, ok := c.items[key]
+	c.mu.RUnlock()
 	if ok {
 		if !item.IsExpired(nil) {
-			v := item.value
-			c.mu.Unlock()
 			if !onLoad {
 				c.stats.IncrHitCount()
 			}
-			return v, nil
+			return item.value, nil
 		}
+		c.mu.Lock()
 		c.remove(key)
+		c.mu.Unlock()
 	}
-	c.mu.Unlock()
 	if !onLoad {
 		c.stats.IncrMissCount()
 	}
